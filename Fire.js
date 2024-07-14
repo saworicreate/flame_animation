@@ -83,7 +83,7 @@ var Fire = function (geometry, options) {
         return mix(mix(mix(rand(i + vec3(0.0, 0.0, 0.0)), rand(i + vec3(1.0, 0.0, 0.0)), u.x),
                       mix(rand(i + vec3(0.0, 1.0, 0.0)), rand(i + vec3(1.0, 1.0, 0.0)), u.x), u.y),
                    mix(mix(rand(i + vec3(0.0, 0.0, 1.0)), rand(i + vec3(1.0, 0.0, 1.0)), u.x),
-                      mix(rand(i + vec3(0.0, 1.0, 1.0)), rand(i + vec3(1.0, 1.0, 1.0)), u.x), u.y), u.z);
+                      mix(rand(i + vec3(0.0, 1.0, 1.0)), rand(i + vec3(1.1, 1.0, 1.0)), u.x), u.y), u.z);
       }
 
       float fbm(vec3 p) {
