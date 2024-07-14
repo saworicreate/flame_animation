@@ -20,7 +20,7 @@ function init() {
     // Create fire material
     const fireMaterial = new THREE.ShaderMaterial({
       uniforms: {
-        texture: { value: texture },
+        pointTexture: { value: texture },
         time: { value: 0.0 }
       },
       vertexShader: `
@@ -31,13 +31,13 @@ function init() {
         }
       `,
       fragmentShader: `
-        uniform sampler2D texture;
+        uniform sampler2D pointTexture;
         uniform float time;
         varying vec2 vUv;
         void main() {
           vec2 uv = vUv;
           uv.y += time * 0.1;
-          vec4 tex = texture2D(texture, uv);
+          vec4 tex = texture2D(pointTexture, uv);
           gl_FragColor = tex;
         }
       `,
