@@ -53,7 +53,7 @@ function createParticles(texture) {
   const particleMaterial = new THREE.ShaderMaterial({
     uniforms: {
       time: { value: 0.0 },
-      texture: { value: texture },
+      pointTexture: { value: texture },
     },
     vertexShader: `
       attribute float size;
@@ -67,11 +67,11 @@ function createParticles(texture) {
       }
     `,
     fragmentShader: `
-      uniform sampler2D texture;
+      uniform sampler2D pointTexture;
       varying vec3 vColor;
 
       void main() {
-        gl_FragColor = vec4(vColor, 1.0) * texture2D(texture, gl_PointCoord);
+        gl_FragColor = vec4(vColor, 1.0) * texture2D(pointTexture, gl_PointCoord);
       }
     `,
     transparent: true,
