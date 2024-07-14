@@ -1,4 +1,4 @@
-let scene, camera, renderer, fire;
+let scene, camera, renderer, fireMesh;
 
 function init() {
   scene = new THREE.Scene();
@@ -9,39 +9,30 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  const fireTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/sprites/spark1.png');
-  const fireMaterial = new THREE.Fire.FireMaterial({
-    map: fireTexture,
-    color: 0xff2200,
-    blending: THREE.AdditiveBlending,
-    transparent: true
+  // Create a plane geometry for the fire
+  const plane = new THREE.PlaneGeometry(3, 3);
+  
+  // Load fire texture
+  const textureLoader = new THREE.TextureLoader();
+  textureLoader.load('https://threejs.org/examples/textures/sprites/fire_particle.png', function(texture) {
+    // Create fire material
+    const fireMaterial = new THREE.Fire(texture);
+
+    // Create fire mesh
+    fireMesh = new THREE.Mesh(plane, fireMaterial);
+    fireMesh.position.set(0, 0, 0);
+    scene.add(fireMesh);
+
+    animate();
   });
-
-  const fireGeometry = new THREE.PlaneBufferGeometry(2, 2);
-  fire = new THREE.Fire(fireGeometry, {
-    fireMaterial: fireMaterial,
-    color1: new THREE.Color(0xffff00),
-    color2: new THREE.Color(0xff0000),
-    burnRate: 1,
-    diffuse: 1,
-    viscosity: 0.3,
-    expansion: -0.2,
-    swirl: 10,
-    drag: 0.3,
-    airSpeed: 0.6,
-    speed: 0.6,
-    massConservation: false
-  });
-
-  fire.position.set(0, 0, 0);
-  scene.add(fire);
-
-  animate();
 }
 
 function animate() {
   requestAnimationFrame(animate);
-  fire.update();
+
+  // Update the fire effect
+  fireMesh.material.update();
+
   renderer.render(scene, camera);
 }
 
@@ -52,6 +43,4 @@ window.addEventListener('resize', () => {
 });
 
 init();
-
-
 
