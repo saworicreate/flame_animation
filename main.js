@@ -1,4 +1,4 @@
-let scene, camera, renderer, particleSystem, clock, textureLoader;
+let scene, camera, renderer, particleSystem, clock;
 
 function init() {
   scene = new THREE.Scene();
@@ -11,7 +11,7 @@ function init() {
 
   clock = new THREE.Clock();
 
-  textureLoader = new THREE.TextureLoader();
+  const textureLoader = new THREE.TextureLoader();
   textureLoader.load('https://threejs.org/examples/textures/sprites/spark1.png', function(texture) {
     createParticles(texture);
     animate();
