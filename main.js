@@ -1,4 +1,4 @@
-let scene, camera, renderer, clock, particleSystem, stats;
+let scene, camera, renderer, particleSystem, clock, textureLoader;
 
 function init() {
   scene = new THREE.Scene();
@@ -11,14 +11,20 @@ function init() {
 
   clock = new THREE.Clock();
 
-  stats = new Stats();
-  document.body.appendChild(stats.dom);
+  textureLoader = new THREE.TextureLoader();
+  textureLoader.load('https://threejs.org/examples/textures/sprites/spark1.png', function(texture) {
+    createParticles(texture);
+    animate();
+  });
+}
 
-  const particleCount = 5000;
+function createParticles(texture) {
+  const particleCount = 2000;
   const particles = new THREE.BufferGeometry();
   const positions = [];
   const velocities = [];
   const colors = [];
+  const sizes = [];
 
   const color = new THREE.Color();
 
@@ -33,37 +39,37 @@ function init() {
 
     color.setHSL(0.1 + Math.random() * 0.2, 1.0, 0.5);
     colors.push(color.r, color.g, color.b);
+
+    sizes.push(20 + Math.random() * 10);
   }
 
   particles.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   particles.setAttribute('velocity', new THREE.Float32BufferAttribute(velocities, 3));
   particles.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  particles.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
 
   const particleMaterial = new THREE.ShaderMaterial({
     uniforms: {
       time: { value: 0.0 },
+      texture: { value: texture },
     },
     vertexShader: `
       attribute float size;
-      attribute vec3 customColor;
       varying vec3 vColor;
-      varying float life;
 
       void main() {
-        vColor = customColor;
-        life = mod((time + position.y) / 3.0, 1.0);
+        vColor = color;
         vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
         gl_PointSize = size * (300.0 / -mvPosition.z);
         gl_Position = projectionMatrix * mvPosition;
       }
     `,
     fragmentShader: `
+      uniform sampler2D texture;
       varying vec3 vColor;
-      varying float life;
 
       void main() {
-        float alpha = 1.0 - life;
-        gl_FragColor = vec4(vColor, alpha);
+        gl_FragColor = vec4(vColor, 1.0) * texture2D(texture, gl_PointCoord);
       }
     `,
     transparent: true,
@@ -72,8 +78,6 @@ function init() {
 
   particleSystem = new THREE.Points(particles, particleMaterial);
   scene.add(particleSystem);
-
-  animate();
 }
 
 function animate() {
@@ -96,7 +100,6 @@ function animate() {
   particleSystem.material.uniforms.time.value = time;
 
   renderer.render(scene, camera);
-  stats.update();
 }
 
 window.addEventListener('resize', () => {
@@ -106,7 +109,5 @@ window.addEventListener('resize', () => {
 });
 
 init();
-
-
 
 
