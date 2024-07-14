@@ -15,6 +15,8 @@ function init() {
   textureLoader.load('https://threejs.org/examples/textures/sprites/spark1.png', function(texture) {
     createParticles(texture);
     animate();
+  }, undefined, function(err) {
+    console.error('An error happened loading the texture:', err);
   });
 }
 
