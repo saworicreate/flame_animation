@@ -1,4 +1,4 @@
-let scene, camera, renderer, fireMesh;
+let scene, camera, renderer, fireMesh, clock;
 
 function init() {
   scene = new THREE.Scene();
@@ -9,14 +9,40 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
+  clock = new THREE.Clock();
+
   // Create a plane geometry for the fire
   const plane = new THREE.PlaneGeometry(3, 3);
   
   // Load fire texture
   const textureLoader = new THREE.TextureLoader();
-  textureLoader.load('https://threejs.org/examples/textures/sprites/fire_particle.png', function(texture) {
+  textureLoader.load('https://threejs.org/examples/textures/sprites/spark1.png', function(texture) {
     // Create fire material
-    const fireMaterial = new THREE.Fire(texture);
+    const fireMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        texture: { value: texture },
+        time: { value: 0.0 }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D texture;
+        uniform float time;
+        varying vec2 vUv;
+        void main() {
+          vec2 uv = vUv;
+          uv.y += time * 0.1;
+          vec4 tex = texture2D(texture, uv);
+          gl_FragColor = tex;
+        }
+      `,
+      transparent: true
+    });
 
     // Create fire mesh
     fireMesh = new THREE.Mesh(plane, fireMaterial);
@@ -30,8 +56,8 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
 
-  // Update the fire effect
-  fireMesh.material.update();
+  const delta = clock.getDelta();
+  fireMesh.material.uniforms.time.value += delta;
 
   renderer.render(scene, camera);
 }
@@ -43,4 +69,3 @@ window.addEventListener('resize', () => {
 });
 
 init();
-
