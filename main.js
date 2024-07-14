@@ -1,4 +1,4 @@
-let scene, camera, renderer, particleSystem;
+let scene, camera, renderer, particleSystem, clock;
 
 function init() {
   scene = new THREE.Scene();
@@ -10,10 +10,13 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  const particleCount = 1000;
+  clock = new THREE.Clock();
+
+  const particleCount = 2000;
   const particles = new THREE.BufferGeometry();
   const positions = [];
   const colors = [];
+  const sizes = [];
 
   const color = new THREE.Color();
 
@@ -22,19 +25,23 @@ function init() {
     positions.push((Math.random() * 2 - 1) * 1.5);
     positions.push((Math.random() * 2 - 1) * 1.5);
 
-    color.setHSL(0.1, 0.9, 0.5);
+    color.setHSL(0.1, 1.0, 0.5);
     colors.push(color.r, color.g, color.b);
+
+    sizes.push(Math.random() * 0.5);
   }
 
   particles.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   particles.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  particles.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
 
   const particleMaterial = new THREE.PointsMaterial({
-    size: 0.1,
+    size: 0.2,
     vertexColors: true,
     transparent: true,
-    opacity: 0.8,
+    opacity: 0.7,
     blending: THREE.AdditiveBlending,
+    depthTest: false
   });
 
   particleSystem = new THREE.Points(particles, particleMaterial);
@@ -46,14 +53,20 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
 
+  const time = clock.getElapsedTime();
   const positions = particleSystem.geometry.attributes.position.array;
+  const sizes = particleSystem.geometry.attributes.size.array;
+
   for (let i = 0; i < positions.length; i += 3) {
-    positions[i + 1] += 0.02;
+    positions[i + 1] += 0.02; // 上昇
     if (positions[i + 1] > 1.5) {
-      positions[i + 1] = -1.5;
+      positions[i + 1] = -1.5; // 下に戻す
     }
+    sizes[i / 3] = (Math.sin(time * 5 + i) + 1) * 0.5; // サイズを変化させる
   }
+
   particleSystem.geometry.attributes.position.needsUpdate = true;
+  particleSystem.geometry.attributes.size.needsUpdate = true;
 
   renderer.render(scene, camera);
 }
@@ -65,5 +78,6 @@ window.addEventListener('resize', () => {
 });
 
 init();
+
 
 
