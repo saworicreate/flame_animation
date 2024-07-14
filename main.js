@@ -37,7 +37,7 @@ function init() {
         void main() {
           vec2 uv = vUv;
           uv.y += time * 0.1;
-          vec4 tex = texture2D(pointTexture, uv);
+          vec4 tex = texture(pointTexture, uv);
           gl_FragColor = tex;
         }
       `,
